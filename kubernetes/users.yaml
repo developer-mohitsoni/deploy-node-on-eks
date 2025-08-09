@@ -5,11 +5,11 @@ metadata:
 spec:
   selector:
     app: users # select the users pod and expose
-  type: LoadBalancer
   ports:
     - protocol: TCP
       port: 8000
       targetPort: 3000
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -27,9 +27,21 @@ spec:
     spec:
       containers:
         - name: users-api
-          image: gomurali/k8s-users:latest
-          env:
-            - name: MONGODB_CONNECTION_URI
-              value: "<your_mongo_db_url>"
-            - name: AUTH_API_ADDRESSS
-              value: "auth-service.default:3000"
+          image: mohitsoni02/k8-users:latest
+          volumeMounts:
+            - name: users-volume
+              mountPath: /app/.env
+              subPath: .env
+              readOnly: true
+      volumes:
+        - name: users-volume
+          secret:
+            secretName: users-secret
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: users-secret
+type: Opaque
+data:
+  .env: TU9OR09EQl9DT05ORUNUSU9OX1VSST1tb25nb2RiK3NydjovL21hc3RlckRldjpteUJhY2tlbmREQkBkZXBsb3ljbHVzdGVyLnh3bjF0OXgubW9uZ29kYi5uZXQvdXNlcj9yZXRyeVdyaXRlcz10cnVlJnc9bWFqb3JpdHkmYXBwTmFtZT1kZXBsb3lDbHVzdGVyCkFVVEhfQVBJX0FERFJFU1M9YXV0aC1zZXJ2aWNlLmRlZmF1bHQ6MzAwMA==

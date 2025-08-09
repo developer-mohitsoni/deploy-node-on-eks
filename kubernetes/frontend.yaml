@@ -5,11 +5,11 @@ metadata:
 spec:
   selector:
     app: frontend # select the users pod and expose
-  type: LoadBalancer
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -27,4 +27,17 @@ spec:
     spec:
       containers:
         - name: frontend-app-container
-          image: gomurali/k8s-frontend-app:latest
+          image: mohitsoni02/k8-frontend-app:latest
+          env:
+            - name: USERS_API
+              valueFrom:
+                configMapKeyRef:
+                  name: frontend-config
+                  key: users_api
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+data:
+  users_api: http://users-service:8000
